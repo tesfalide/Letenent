@@ -1,0 +1,6 @@
+{
+  "name": "letenent",
+  "description": "High-performance coaching operating system featuring Dashboard, live activities feed, athlete roster, program builder, and weekly accountability engine with Black and Bright themes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

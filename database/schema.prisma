@@ -1,0 +1,232 @@
+// database/schema.prisma
+// Letenent Coaching OS — Production Relational Database Schema
+// Optimized for PostgreSQL with high concurrency and strict role isolation
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  COACH
+  TRAINEE
+  ADMIN
+}
+
+enum ClientStatus {
+  ACTIVE
+  INVITED
+  PAUSED
+}
+
+enum WorkoutStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  MISSED
+}
+
+enum CheckInStatus {
+  PENDING_REVIEW
+  REVIEWED
+}
+
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  name          String
+  passwordHash  String?
+  role          UserRole        @default(TRAINEE)
+  avatarUrl     String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  coachProfile  CoachProfile?
+  traineeProfile TraineeProfile?
+
+  @@index([email])
+}
+
+model CoachProfile {
+  id           String             @id @default(cuid())
+  userId       String             @unique
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName String?
+  bio          String?
+  specialties  String[]           @default([])
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  trainees     TraineeProfile[]
+  templates    WorkoutTemplate[]
+  programs     AssignedProgram[]
+  checkInsReviewed CheckIn[]      @relation("CoachCheckInReview")
+}
+
+model TraineeProfile {
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coachId         String
+  coach           CoachProfile       @relation(fields: [coachId], references: [id], onDelete: Restrict)
+  status          ClientStatus       @default(INVITED)
+  onboardingToken String?            @unique
+  targetFocus     String             @default("General Hypertrophy & Strength")
+  joinedAt        DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  assignedPrograms AssignedProgram[]
+  workoutLogs     WorkoutLog[]
+  checkIns        CheckIn[]
+
+  @@index([coachId])
+  @@index([status])
+}
+
+model Exercise {
+  id          String                 @id @default(cuid())
+  name        String
+  muscleGroup String
+  equipment   String
+  videoUrl    String?
+  notes       String?
+  createdAt   DateTime               @default(now())
+
+  workoutItems AssignedExerciseItem[]
+  setLogs      SetLog[]
+
+  @@index([muscleGroup])
+  @@index([name])
+}
+
+model WorkoutTemplate {
+  id          String                 @id @default(cuid())
+  coachId     String
+  coach       CoachProfile           @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  dayOfWeek   Int?                   // 1 (Monday) to 7 (Sunday)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@index([coachId])
+}
+
+model AssignedProgram {
+  id            String             @id @default(cuid())
+  title         String
+  description   String?
+  coachId       String
+  coach         CoachProfile       @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  traineeId     String
+  trainee       TraineeProfile     @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  durationWeeks Int                @default(4)
+  startDate     DateTime           @default(now())
+  endDate       DateTime?
+  isActive      Boolean            @default(true)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  workouts      AssignedWorkout[]
+
+  @@index([traineeId])
+  @@index([coachId])
+}
+
+model AssignedWorkout {
+  id          String                 @id @default(cuid())
+  programId   String
+  program     AssignedProgram        @relation(fields: [programId], references: [id], onDelete: Cascade)
+  title       String
+  dayOfWeek   Int                    // 1-7
+  scheduledFor DateTime?
+  status      WorkoutStatus          @default(PENDING)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  exercises   AssignedExerciseItem[]
+  workoutLogs WorkoutLog[]
+
+  @@index([programId])
+}
+
+model AssignedExerciseItem {
+  id               String          @id @default(cuid())
+  assignedWorkoutId String
+  assignedWorkout  AssignedWorkout @relation(fields: [assignedWorkoutId], references: [id], onDelete: Cascade)
+  exerciseId       String
+  exercise         Exercise        @relation(fields: [exerciseId], references: [id], onDelete: Restrict)
+  orderIndex       Int             @default(0)
+  targetSets       Int             @default(3)
+  targetReps       String          @default("8-10")
+  targetLoad       Float           @default(0.0)
+  targetRpe        Float?          @default(8.0)
+  restSeconds      Int             @default(90)
+  coachNotes       String?
+
+  @@index([assignedWorkoutId])
+}
+
+model WorkoutLog {
+  id                String          @id @default(cuid())
+  traineeId         String
+  trainee           TraineeProfile  @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  assignedWorkoutId String
+  assignedWorkout   AssignedWorkout @relation(fields: [assignedWorkoutId], references: [id], onDelete: Cascade)
+  startedAt         DateTime        @default(now())
+  completedAt       DateTime?
+  status            WorkoutStatus   @default(IN_PROGRESS)
+  sessionRpe        Float?
+  sessionNotes      String?
+  createdAt         DateTime        @default(now())
+
+  sets              SetLog[]
+
+  @@index([traineeId])
+  @@index([assignedWorkoutId])
+}
+
+model SetLog {
+  id           String     @id @default(cuid())
+  workoutLogId String
+  workoutLog   WorkoutLog @relation(fields: [workoutLogId], references: [id], onDelete: Cascade)
+  exerciseId   String
+  exercise     Exercise   @relation(fields: [exerciseId], references: [id], onDelete: Restrict)
+  setNumber    Int
+  targetReps   String
+  targetLoad   Float
+  actualReps   Int
+  actualLoad   Float
+  rpe          Float?
+  completed    Boolean    @default(false)
+  completedAt  DateTime?
+
+  @@index([workoutLogId])
+  @@index([exerciseId])
+}
+
+model CheckIn {
+  id                 String         @id @default(cuid())
+  traineeId          String
+  trainee            TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  morningWeightLbs   Float
+  energyScore        Int            // 1-10
+  stressScore        Int            // 1-10
+  sleepScore         Int            // 1-10
+  dietAdherenceScore Int            // 1-10
+  wins               String         @db.Text
+  struggles          String         @db.Text
+  status             CheckInStatus  @default(PENDING_REVIEW)
+  reviewedById       String?
+  reviewedBy         CoachProfile?  @relation("CoachCheckInReview", fields: [reviewedById], references: [id], onDelete: SetNull)
+  coachFeedback      String?        @db.Text
+  submittedAt        DateTime       @default(now())
+  reviewedAt         DateTime?
+
+  @@index([traineeId])
+  @@index([status])
+}

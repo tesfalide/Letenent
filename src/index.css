@@ -1,0 +1,398 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #000000;
+    color: #ffffff;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  body.theme-bright {
+    background-color: #f8fafc;
+    color: #0f172a;
+  }
+}
+
+/* Explicit heading colors for Black Theme to ensure 100% visibility */
+.theme-black h1,
+.theme-black h2,
+.theme-black h3,
+.theme-black h4,
+.theme-black .heading-primary {
+  color: #ffffff !important;
+}
+
+/* Bright text selection */
+::selection {
+  background-color: #10b981;
+  color: #000000;
+  font-weight: 700;
+}
+
+body.theme-bright ::selection {
+  background-color: #059669;
+  color: #ffffff;
+}
+
+/* Custom crisp dark scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+.theme-bright ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 9999px;
+  border: 1px solid #3f3f46;
+}
+.theme-bright ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border: 1px solid #94a3b8;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+.theme-bright ::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+
+/* Tactile inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* BRIGHT THEME RULES */
+.theme-bright {
+  color-scheme: light;
+}
+
+/* Surfaces (exclude sidebar) */
+.theme-bright .bg-black:not(.sidebar-black):not(.sidebar-drawer-black):not(#sidebar-footer),
+.theme-bright .bg-black\/95:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-black\/90:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-black\/85:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-black\/80:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-black\/75:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-black\/60:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-black\/50:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-black\/40:not(.sidebar-black):not(#sidebar-footer) {
+  background-color: #ffffff !important;
+}
+.theme-bright .bg-zinc-950:not(.sidebar-black):not(.sidebar-drawer-black):not(#sidebar-footer),
+.theme-bright .bg-zinc-950\/95:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-zinc-950\/90:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-zinc-950\/85:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-zinc-950\/80:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-zinc-950\/70:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-zinc-950\/60:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .bg-zinc-950\/50:not(.sidebar-black):not(#sidebar-footer) {
+  background-color: #ffffff !important;
+}
+.theme-bright aside:not(.sidebar-black),
+.theme-bright header {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Persistent Black Sidebar (Desktop & Mobile) */
+.sidebar-black,
+.sidebar-drawer-black,
+#sidebar-footer {
+  background-color: #09090b !important;
+  color: #ffffff !important;
+  border-color: #27272a !important;
+}
+.theme-bright aside.sidebar-black,
+.theme-bright .sidebar-black,
+.theme-bright .sidebar-drawer-black,
+.theme-bright #sidebar-footer {
+  background-color: #09090b !important;
+  color: #ffffff !important;
+  border-color: #27272a !important;
+}
+.theme-bright .sidebar-black .text-white,
+.theme-bright .sidebar-drawer-black .text-white {
+  color: #ffffff !important;
+}
+.theme-bright .sidebar-black .text-zinc-100,
+.theme-bright .sidebar-black .text-zinc-200,
+.theme-bright .sidebar-drawer-black .text-zinc-100,
+.theme-bright .sidebar-drawer-black .text-zinc-200 {
+  color: #e4e4e7 !important;
+}
+.theme-bright .sidebar-black .text-zinc-300,
+.theme-bright .sidebar-drawer-black .text-zinc-300 {
+  color: #d4d4d8 !important;
+}
+.theme-bright .sidebar-black .text-zinc-400,
+.theme-bright .sidebar-drawer-black .text-zinc-400 {
+  color: #a1a1aa !important;
+}
+.theme-bright .sidebar-black .text-zinc-500,
+.theme-bright .sidebar-drawer-black .text-zinc-500 {
+  color: #71717a !important;
+}
+.theme-bright .sidebar-black .bg-zinc-900,
+.theme-bright .sidebar-drawer-black .bg-zinc-900 {
+  background-color: #18181b !important;
+}
+.theme-bright .sidebar-black .bg-zinc-950,
+.theme-bright .sidebar-drawer-black .bg-zinc-950 {
+  background-color: #09090b !important;
+}
+.theme-bright .sidebar-black .border-zinc-800,
+.theme-bright .sidebar-black .border-zinc-800\/80,
+.theme-bright .sidebar-drawer-black .border-zinc-800,
+.theme-bright .sidebar-drawer-black .border-zinc-800\/80,
+.theme-bright #sidebar-footer {
+  border-color: #27272a !important;
+}
+.theme-bright .sidebar-black input:not(.border-transparent),
+.theme-bright .sidebar-drawer-black input:not(.border-transparent) {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+  border-color: #27272a !important;
+}
+.sidebar-black input.border-transparent,
+.sidebar-drawer-black input.border-transparent,
+.theme-bright .sidebar-black input.border-transparent,
+.theme-bright .sidebar-drawer-black input.border-transparent,
+.sidebar-black nav button,
+.sidebar-drawer-black nav button,
+.theme-bright .sidebar-black nav button,
+.theme-bright .sidebar-drawer-black nav button {
+  border-color: transparent !important;
+}
+.theme-bright .sidebar-black input::placeholder,
+.theme-bright .sidebar-drawer-black input::placeholder {
+  color: #71717a !important;
+}
+
+/* Ensure sidebar links and buttons stay clearly visible on hover in Bright Theme */
+.theme-bright .sidebar-black button:hover,
+.theme-bright .sidebar-black a:hover,
+.theme-bright .sidebar-black button:hover *,
+.theme-bright .sidebar-black a:hover *,
+.theme-bright .sidebar-black .hover\:text-white:hover,
+.theme-bright .sidebar-drawer-black button:hover,
+.theme-bright .sidebar-drawer-black a:hover,
+.theme-bright .sidebar-drawer-black button:hover *,
+.theme-bright .sidebar-drawer-black a:hover *,
+.theme-bright .sidebar-drawer-black .hover\:text-white:hover,
+.theme-bright #app-sidebar button:hover,
+.theme-bright #app-sidebar a:hover,
+.theme-bright #app-sidebar button:hover *,
+.theme-bright #app-sidebar a:hover *,
+.theme-bright #app-sidebar .hover\:text-white:hover {
+  color: #ffffff !important;
+}
+
+.theme-bright .sidebar-black .hover\:text-zinc-200:hover,
+.theme-bright .sidebar-drawer-black .hover\:text-zinc-200:hover,
+.theme-bright #app-sidebar .hover\:text-zinc-200:hover {
+  color: #f4f4f5 !important;
+}
+
+.theme-bright .sidebar-black .hover\:bg-zinc-900\/60:hover,
+.theme-bright .sidebar-black .hover\:bg-zinc-900\/80:hover,
+.theme-bright .sidebar-black .hover\:bg-zinc-900:hover,
+.theme-bright .sidebar-black .hover\:bg-zinc-850:hover,
+.theme-bright .sidebar-black .hover\:bg-zinc-800:hover,
+.theme-bright .sidebar-drawer-black .hover\:bg-zinc-900\/60:hover,
+.theme-bright .sidebar-drawer-black .hover\:bg-zinc-900:hover,
+.theme-bright .sidebar-drawer-black .hover\:bg-zinc-850:hover,
+.theme-bright .sidebar-drawer-black .hover\:bg-zinc-800:hover,
+.theme-bright #app-sidebar .hover\:bg-zinc-900\/60:hover,
+.theme-bright #app-sidebar .hover\:bg-zinc-900:hover,
+.theme-bright #app-sidebar .hover\:bg-zinc-850:hover,
+.theme-bright #app-sidebar .hover\:bg-zinc-800:hover {
+  background-color: #27272a !important;
+}
+
+.theme-bright .sidebar-black .hover\:border-zinc-700:hover,
+.theme-bright .sidebar-drawer-black .hover\:border-zinc-700:hover,
+.theme-bright #app-sidebar .hover\:border-zinc-700:hover {
+  border-color: #3f3f46 !important;
+}
+
+/* Explicit brand styling for Letenent in Bright Theme */
+.theme-bright [data-brand="letenent"],
+.theme-bright .brand-letenent {
+  color: #09090b !important;
+  font-weight: 900 !important;
+}
+.theme-bright .bg-zinc-900,
+.theme-bright .bg-zinc-900\/90,
+.theme-bright .bg-zinc-900\/80,
+.theme-bright .bg-zinc-900\/70,
+.theme-bright .bg-zinc-900\/60,
+.theme-bright .bg-zinc-900\/50,
+.theme-bright .bg-zinc-900\/40 {
+  background-color: #f8fafc !important;
+}
+.theme-bright .bg-zinc-850,
+.theme-bright .bg-zinc-800 {
+  background-color: #f1f5f9 !important;
+}
+.theme-bright .bg-zinc-800\/80,
+.theme-bright .bg-zinc-800\/60 {
+  background-color: #f1f5f9 !important;
+}
+.theme-bright .hover\:bg-zinc-900:hover,
+.theme-bright .hover\:bg-zinc-850:hover,
+.theme-bright .hover\:bg-zinc-800:hover {
+  background-color: #e2e8f0 !important;
+}
+.theme-bright .hover\:bg-black:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Borders */
+.theme-bright .border-zinc-800:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .border-zinc-800\/90:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .border-zinc-800\/80:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .border-zinc-800\/70:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .border-zinc-800\/60:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .border-zinc-700:not(.sidebar-black):not(#sidebar-footer),
+.theme-bright .border-zinc-700\/80:not(.sidebar-black):not(#sidebar-footer) {
+  border-color: #e2e8f0 !important;
+}
+.theme-bright .hover\:border-zinc-700:hover,
+.theme-bright .hover\:border-zinc-500:hover {
+  border-color: #cbd5e1 !important;
+}
+
+/* Typography hierarchy */
+.theme-bright .text-white {
+  color: #0f172a !important;
+}
+.theme-bright .text-zinc-100,
+.theme-bright .text-zinc-200 {
+  color: #1e293b !important;
+}
+.theme-bright .text-zinc-300 {
+  color: #334155 !important;
+}
+.theme-bright .text-zinc-400 {
+  color: #64748b !important;
+}
+.theme-bright .text-zinc-500 {
+  color: #94a3b8 !important;
+}
+.theme-bright .hover\:text-white:hover {
+  color: #0f172a !important;
+}
+.theme-bright .hover\:text-zinc-200:hover {
+  color: #1e293b !important;
+}
+
+/* Emerald accents */
+.theme-bright .bg-emerald-500\/20,
+.theme-bright .bg-emerald-500\/10 {
+  background-color: #d1fae5 !important;
+}
+.theme-bright .border-emerald-400\/50,
+.theme-bright .border-emerald-500\/30,
+.theme-bright .border-emerald-500\/20 {
+  border-color: #6ee7b7 !important;
+}
+.theme-bright .text-emerald-300,
+.theme-bright .text-emerald-400 {
+  color: #059669 !important;
+}
+.theme-bright .bg-emerald-400 {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+}
+.theme-bright .hover\:bg-emerald-300:hover {
+  background-color: #047857 !important;
+}
+.theme-bright .bg-emerald-950,
+.theme-bright .bg-emerald-950\/30,
+.theme-bright .bg-emerald-950\/20 {
+  background-color: #ecfdf5 !important;
+}
+.theme-bright .border-emerald-900\/40,
+.theme-bright .border-emerald-500\/40 {
+  border-color: #a7f3d0 !important;
+}
+.theme-bright .text-emerald-100 {
+  color: #065f46 !important;
+}
+
+/* Amber accents */
+.theme-bright .bg-amber-500\/20,
+.theme-bright .bg-amber-500\/10 {
+  background-color: #fef3c7 !important;
+}
+.theme-bright .border-amber-400\/50,
+.theme-bright .border-amber-500\/20 {
+  border-color: #fde68a !important;
+}
+.theme-bright .text-amber-300,
+.theme-bright .text-amber-400 {
+  color: #d97706 !important;
+}
+
+/* Sky/Blue accents */
+.theme-bright .bg-sky-500\/20,
+.theme-bright .bg-blue-500\/20,
+.theme-bright .bg-blue-600\/20 {
+  background-color: #e0f2fe !important;
+}
+.theme-bright .border-sky-400\/50,
+.theme-bright .border-blue-500\/30 {
+  border-color: #bae6fd !important;
+}
+.theme-bright .text-sky-300,
+.theme-bright .text-blue-300,
+.theme-bright .text-blue-400 {
+  color: #0284c7 !important;
+}
+
+/* Shadows and cards */
+.theme-bright .shadow-2xl,
+.theme-bright .shadow-xl,
+.theme-bright .shadow-lg {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Inputs in bright theme */
+.theme-bright input[type="text"],
+.theme-bright input[type="number"],
+.theme-bright input[type="email"],
+.theme-bright input[type="date"],
+.theme-bright textarea,
+.theme-bright select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+.theme-bright input::placeholder,
+.theme-bright textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Fixed Footer Dock */
+#floating-footer-dock {
+  position: fixed !important;
+  bottom: 0 !important;
+}
+
