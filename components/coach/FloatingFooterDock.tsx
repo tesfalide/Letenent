@@ -40,6 +40,7 @@ interface FloatingFooterDockProps {
   onNavigateToRoster: () => void;
   onNavigateToProgram: (traineeId: string) => void;
   onNavigateToSettings: () => void;
+  onSignOut?: () => void;
 }
 
 const INITIAL_CONVERSATIONS: Record<string, Conversation> = {
@@ -132,6 +133,7 @@ export const FloatingFooterDock: React.FC<FloatingFooterDockProps> = ({
   onNavigateToRoster,
   onNavigateToProgram,
   onNavigateToSettings,
+  onSignOut,
 }) => {
   const { isBright, toggleTheme } = useTheme();
   const [activePanel, setActivePanel] = useState<OpenPanel>(null);
@@ -724,7 +726,10 @@ export const FloatingFooterDock: React.FC<FloatingFooterDockProps> = ({
 
               <button
                 onClick={() => {
-                  alert('Session active for Roger Bothman (Letenent Coaching OS)');
+                  setActivePanel(null);
+                  if (onSignOut) {
+                    onSignOut();
+                  }
                 }}
                 className={`w-full p-2 rounded-xl text-xs font-medium flex items-center justify-between transition-colors text-rose-500 ${
                   isBright ? 'hover:bg-rose-50' : 'hover:bg-rose-950/30'

@@ -1,5 +1,7 @@
 export type UserRole = 'COACH' | 'TRAINEE' | 'ADMIN';
 
+export type UserAccountStatus = 'ACTIVE' | 'SUSPENDED' | 'INVITED';
+
 export type ClientStatus = 'ACTIVE' | 'INVITED' | 'PAUSED';
 
 export type WorkoutStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED';
@@ -9,9 +11,94 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  status?: UserAccountStatus;
   avatarUrl?: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
+  lastActiveAt?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface AdminUserRecord {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  name: string;
+  role: UserRole;
+  status: UserAccountStatus;
+  avatarUrl?: string;
+  phone?: string;
+  createdAt: string;
+  updatedAt: string;
+  lastActiveAt: string;
+  // Coach specific relationship fields
+  traineesCount?: number;
+  activeProgramsCount?: number;
+  specialties?: string[];
+  bio?: string;
+  // Trainee specific relationship fields
+  assignedCoachId?: string;
+  assignedCoachName?: string;
+  currentProgramTitle?: string;
+  targetFocus?: string;
+  compliance14Days?: number;
+  // Invitation specific fields
+  invitationSentAt?: string;
+  invitationStatus?: 'PENDING' | 'ACCEPTED' | 'EXPIRED';
+}
+
+export interface UserActivityRecord {
+  id: string;
+  userId: string;
+  activity: string;
+  category: 'LOGIN' | 'WORKOUT' | 'PROGRAM' | 'PROFILE' | 'INVITATION' | 'SECURITY' | 'STATUS_CHANGE';
+  timestamp: string;
+  details?: string;
+}
+
+export interface AuditLogRecord {
+  id: string;
+  adminId: string;
+  adminName: string;
+  action:
+    | 'USER_CREATED'
+    | 'USER_EDITED'
+    | 'ROLE_CHANGED'
+    | 'USER_SUSPENDED'
+    | 'USER_ACTIVATED'
+    | 'INVITATION_RESENT'
+    | 'INVITATION_CANCELLED';
+  targetUserId: string;
+  targetUserName: string;
+  details: string;
+  timestamp: string;
+  result: 'SUCCESS' | 'FAILURE';
+}
+
+export interface UserStatistics {
+  totalUsers: number;
+  activeUsers: number;
+  coaches: number;
+  trainees: number;
+  suspendedUsers: number;
+  invitedUsers?: number;
+}
+
+export interface UserQueryParams {
+  page: number;
+  pageSize: number;
+  searchQuery?: string;
+  roleFilter?: 'ALL' | 'ADMIN' | 'COACH' | 'TRAINEE';
+  statusFilter?: 'ALL' | 'ACTIVE' | 'SUSPENDED' | 'INVITED';
+  registrationDateFilter?: 'ALL' | 'TODAY' | '7D' | '30D' | 'CUSTOM';
+  customDateStart?: string;
+  customDateEnd?: string;
+  lastActiveFilter?: 'ANY' | 'TODAY' | '7D' | '30D' | 'INACTIVE';
+  sortBy?: 'name' | 'email' | 'role' | 'status' | 'joined' | 'lastActive';
+  sortDirection?: 'asc' | 'desc';
 }
 
 export interface CoachProfile {

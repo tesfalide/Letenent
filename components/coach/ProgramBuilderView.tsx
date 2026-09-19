@@ -19,6 +19,7 @@ import { ExerciseItemPayload, TraineeProfile } from '@/types';
 import { INITIAL_EXERCISES, INITIAL_TRAINEES } from '@/lib/mock-data';
 import { createProgramSchema } from '@/lib/validations/program';
 import { useTheme } from '../../src/context/ThemeContext';
+import { saveAssignedProgram } from '@/lib/program-store';
 
 interface ProgramBuilderViewProps {
   trainees?: TraineeProfile[];
@@ -213,6 +214,39 @@ export const ProgramBuilderView: React.FC<ProgramBuilderViewProps> = ({
     }
 
     setIsSaving(true);
+    
+    // Save to shared program store for the trainee
+    saveAssignedProgram({
+      id: `prog_${Date.now()}`,
+      title,
+      description,
+      coachName: 'Roger Bothman',
+      coachAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      traineeId: traineeId || 'trainee_kaiya',
+      durationWeeks,
+      currentWeek: 1,
+      assignedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'ACTIVE',
+      invitationMessage: `New program "${title}" assigned by Coach Roger Bothman!`,
+      workouts: workouts.map((w, idx) => ({
+        id: w.id || `w_${idx + 1}`,
+        title: w.title,
+        dayOfWeek: w.dayOfWeek,
+        estimatedDurationMins: 55,
+        exercises: w.exercises.map((ex, exIdx) => ({
+          exerciseId: ex.exerciseId,
+          exerciseName: ex.exerciseName,
+          orderIndex: exIdx,
+          targetSets: Number(ex.targetSets) || 3,
+          targetReps: String(ex.targetReps) || '8-10',
+          targetLoad: Number(ex.targetLoad) || 0,
+          targetRpe: Number(ex.targetRpe) || 8,
+          restSeconds: Number(ex.restSeconds) || 90,
+          coachNotes: ex.coachNotes || '',
+        })),
+      })),
+    });
+
     setTimeout(() => {
       setIsSaving(false);
       setIsSaved(true);

@@ -39,6 +39,11 @@ import { ExerciseLibraryView } from '@/components/coach/ExerciseLibraryView';
 import { SettingsView } from '@/components/coach/SettingsView';
 import { FloatingFooterDock } from '@/components/coach/FloatingFooterDock';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { SignInView } from '@/components/auth/SignInView';
+import { TraineePortalView } from '@/components/trainee/TraineePortalView';
+import { AdminDashboardView } from '@/components/admin/AdminDashboardView';
+import { AccessDeniedView } from '@/components/admin/AccessDeniedView';
 
 type ActiveTab =
   | 'trainees_dashboard'
@@ -49,6 +54,7 @@ type ActiveTab =
   | 'check_in_engine';
 
 function AppContent() {
+  const { currentUser, currentTrainee, signOut, signInAsCoach, signInAsTrainee } = useAuth();
   const [activeTab, setActiveTab] = useState<ActiveTab>('trainees_dashboard');
   const [trainees, setTrainees] = useState<TraineeProfile[]>(INITIAL_TRAINEES);
   const [checkIns, setCheckIns] = useState<CheckIn[]>(INITIAL_CHECK_INS);
@@ -56,6 +62,63 @@ function AppContent() {
   const [selectedTraineeForProgram, setSelectedTraineeForProgram] = useState<string | undefined>();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { theme, setTheme, toggleTheme, isBright } = useTheme();
+
+  // Current browser pathname state for route protection
+  const [currentPath, setCurrentPath] = useState(() =>
+    typeof window !== 'undefined' ? window.location.pathname : '/'
+  );
+
+  React.useEffect(() => {
+    const handlePop = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, []);
+
+  // If not authenticated, display the Sign In page for coaches, trainees, and administrators
+  if (!currentUser) {
+    return <SignInView />;
+  }
+
+  // Strict Access Control Guard:
+  // If non-admin user attempts to access any /admin/* route, show 403 Forbidden screen
+  if (currentUser.role !== 'ADMIN' && currentPath.startsWith('/admin')) {
+    return (
+      <AccessDeniedView
+        userRole={currentUser.role}
+        attemptedPath={currentPath}
+        onReturnToDashboard={() => {
+          window.history.pushState({}, '', '/');
+          setCurrentPath('/');
+        }}
+        onSignOut={signOut}
+      />
+    );
+  }
+
+  // If authenticated user is an administrator, render the Admin Control Center
+  if (currentUser.role === 'ADMIN') {
+    return (
+      <AdminDashboardView
+        adminUser={currentUser}
+        onSignOut={signOut}
+        onSwitchToCoach={() => signInAsCoach(CURRENT_COACH.email)}
+        onSwitchToTrainee={() => signInAsTrainee('trainee_kaiya')}
+      />
+    );
+  }
+
+  // If authenticated user is an athlete / trainee, render the dedicated Trainee Portal
+  if (currentUser.role === 'TRAINEE') {
+    return (
+      <TraineePortalView
+        trainee={currentTrainee || INITIAL_TRAINEES[0]}
+        onSignOut={signOut}
+        onSwitchToCoach={() => signInAsCoach(CURRENT_COACH.email)}
+      />
+    );
+  }
 
   // Quick navigation handlers from dashboard & roster
   const handleSelectTraineeForReview = (_trainee: TraineeProfile) => {
@@ -191,8 +254,10 @@ function AppContent() {
           </div>
 
           <button
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
+            onClick={signOut}
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-zinc-900 transition-colors"
             title="Log out"
+            aria-label="Log out"
           >
             <LogOut className="w-4 h-4" />
           </button>
@@ -262,6 +327,18 @@ function AppContent() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
             <span className="hidden sm:inline">{CURRENT_COACH.name}</span>
           </span>
+
+          {/* Mobile Sign Out Button */}
+          <button
+            onClick={signOut}
+            className={`p-2 rounded-xl border transition-colors ${
+              isBright ? 'bg-slate-100 border-slate-300 text-rose-500 hover:bg-rose-50' : 'bg-zinc-900 border-zinc-700 text-rose-400 hover:bg-zinc-800'
+            }`}
+            title="Sign Out"
+            aria-label="Sign Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </header>
 
@@ -437,6 +514,7 @@ function AppContent() {
             setActiveTab('coach_program_builder');
           }}
           onNavigateToSettings={() => setActiveTab('settings')}
+          onSignOut={signOut}
         />
       </div>
     </div>
@@ -446,7 +524,9 @@ function AppContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ThemeProvider>
   );
 }
