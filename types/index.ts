@@ -1,6 +1,6 @@
 export type UserRole = 'COACH' | 'TRAINEE' | 'ADMIN';
 
-export type UserAccountStatus = 'ACTIVE' | 'SUSPENDED' | 'INVITED';
+export type UserAccountStatus = 'ACTIVE' | 'SUSPENDED' | 'INVITED' | 'INACTIVE';
 
 export type ClientStatus = 'ACTIVE' | 'INVITED' | 'PAUSED';
 
@@ -35,8 +35,13 @@ export interface AdminUserRecord {
   updatedAt: string;
   lastActiveAt: string;
   // Coach specific relationship fields
+  professionalTitle?: string;
   traineesCount?: number;
   activeProgramsCount?: number;
+  completedProgramsCount?: number;
+  workoutCompletionsCount?: number;
+  retentionRate?: number;
+  complianceRate?: number;
   specialties?: string[];
   bio?: string;
   // Trainee specific relationship fields
@@ -48,6 +53,91 @@ export interface AdminUserRecord {
   // Invitation specific fields
   invitationSentAt?: string;
   invitationStatus?: 'PENDING' | 'ACCEPTED' | 'EXPIRED';
+}
+
+export interface CoachRecord extends AdminUserRecord {
+  role: 'COACH';
+}
+
+export interface CoachStatistics {
+  totalCoaches: number;
+  activeCoaches: number;
+  inactiveCoaches: number;
+  totalTrainees: number;
+  activePrograms: number;
+  avgTraineesPerCoach: number;
+}
+
+export interface CoachQueryParams {
+  page: number;
+  pageSize: number;
+  searchQuery?: string;
+  statusFilter?: 'ALL' | 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  activityFilter?: 'ALL' | 'RECENT' | '7D' | '30D';
+  traineeCountFilter?: 'ALL' | 'ZERO' | '1_10' | '11_25' | '26_PLUS';
+  programFilter?: 'ALL' | 'NO_PROGRAMS' | 'HAS_ACTIVE';
+  joinedFilter?: 'ALL' | 'TODAY' | '7D' | '30D' | 'CUSTOM';
+  customDateStart?: string;
+  customDateEnd?: string;
+  sortBy?: 'name' | 'email' | 'trainees' | 'programs' | 'lastActive' | 'joined' | 'status';
+  sortDirection?: 'asc' | 'desc';
+}
+
+export interface CoachTraineeItem {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  currentProgramTitle: string;
+  workoutCompliance: number;
+  lastActivity: string;
+  status: 'ACTIVE' | 'INVITED' | 'PAUSED';
+  joinedDate: string;
+  assignedWorkoutId?: string;
+}
+
+export interface CoachProgramItem {
+  id: string;
+  title: string;
+  description?: string;
+  traineesCount: number;
+  durationWeeks: number;
+  completionRate: number;
+  status: 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
+  createdAt: string;
+}
+
+export interface CoachActivityEvent {
+  id: string;
+  coachId: string;
+  type:
+    | 'PROGRAM_CREATED'
+    | 'TRAINEE_ADDED'
+    | 'WORKOUT_UPDATED'
+    | 'REVIEW_COMPLETED'
+    | 'MESSAGE_SENT'
+    | 'PROFILE_UPDATED'
+    | 'LOGIN';
+  title: string;
+  description: string;
+  timestamp: string;
+}
+
+export interface CoachPerformanceMetrics {
+  traineeRetentionRate: number; // e.g. 94%
+  workoutCompletionRate: number; // e.g. 91%
+  programCompletionRate: number; // e.g. 88%
+  activeTraineePercentage: number; // e.g. 85%
+  activityScore: number; // Monthly activities logged
+}
+
+export interface CoachChartDataPoint {
+  date: string;
+  label: string;
+  traineeActivity: number;
+  workoutActivity: number;
+  programActivity: number;
+  messages: number;
 }
 
 export interface UserActivityRecord {
@@ -70,7 +160,13 @@ export interface AuditLogRecord {
     | 'USER_SUSPENDED'
     | 'USER_ACTIVATED'
     | 'INVITATION_RESENT'
-    | 'INVITATION_CANCELLED';
+    | 'INVITATION_CANCELLED'
+    | 'COACH_CREATED'
+    | 'COACH_EDITED'
+    | 'COACH_SUSPENDED'
+    | 'COACH_ACTIVATED'
+    | 'COACH_INVITED'
+    | 'PROGRAM_ARCHIVED';
   targetUserId: string;
   targetUserName: string;
   details: string;

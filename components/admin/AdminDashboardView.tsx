@@ -9,6 +9,7 @@ import { AdminDashboard } from './AdminDashboard';
 import { AdminPlaceholderView, AdminSectionKey } from './AdminPlaceholderView';
 import { AdminQuickActionModal, QuickActionType } from './AdminQuickActionModal';
 import { UserManagementView } from './users/UserManagementView';
+import { CoachManagementView } from './coaches/CoachManagementView';
 import { CheckCircle2 } from 'lucide-react';
 
 interface AdminDashboardViewProps {
@@ -55,8 +56,22 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     return null;
   };
 
+  const getInitialSelectedCoachId = (): string | null => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path.startsWith('/admin/coaches/')) {
+        const parts = path.split('/admin/coaches/');
+        if (parts[1] && parts[1].trim()) {
+          return decodeURIComponent(parts[1].trim());
+        }
+      }
+    }
+    return null;
+  };
+
   const [currentSection, setCurrentSection] = useState<AdminSectionKey | 'dashboard'>(getInitialSection);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(getInitialSelectedUserId);
+  const [selectedCoachId, setSelectedCoachId] = useState<string | null>(getInitialSelectedCoachId);
 
   // Quick Action Modal state
   const [activeQuickAction, setActiveQuickAction] = useState<QuickActionType | null>(null);
@@ -66,6 +81,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   const handleSelectSection = (section: AdminSectionKey | 'dashboard') => {
     setCurrentSection(section);
     setSelectedUserId(null);
+    setSelectedCoachId(null);
     if (typeof window !== 'undefined') {
       const pathMap: Record<AdminSectionKey | 'dashboard', string> = {
         dashboard: '/admin/dashboard',
@@ -109,6 +125,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     const handlePopState = () => {
       setCurrentSection(getInitialSection());
       setSelectedUserId(getInitialSelectedUserId());
+      setSelectedCoachId(getInitialSelectedCoachId());
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -157,6 +174,12 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         <UserManagementView
           currentAdmin={adminUser}
           initialSelectedUserId={selectedUserId}
+          onNavigateToUser={handleNavigateToUser}
+        />
+      ) : currentSection === 'coaches' ? (
+        <CoachManagementView
+          currentUser={adminUser}
+          initialSelectedCoachId={selectedCoachId}
           onNavigateToUser={handleNavigateToUser}
         />
       ) : (
